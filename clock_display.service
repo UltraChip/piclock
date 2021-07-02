@@ -1,0 +1,15 @@
+## CLOCK DISPLAY SERVICE FILE
+## 
+## Allows you to run the PiClock display driver as a service.
+## Intended to be placed in /lib/systemd/system/
+
+[Unit]
+Description=Kicks off the PiClock display driver.
+After=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /usr/bin/clock_display.py
+
+[Install]
+WantedBy=multi-user.target

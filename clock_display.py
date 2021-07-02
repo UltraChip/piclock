@@ -7,7 +7,13 @@ import i2clcd
 import subprocess
 import sys
 from datetime import datetime
+from time import sleep
 
+# Scheduled events - times when certain events should happen. Note that the
+#     dates supplied are just fillers - they are ignored during actual
+#     execution.
+light_on  = datetime(1970, 1, 1,  6,  0, 0)  # Time the backlight should be switched on
+light_off = datetime(1970, 1, 1, 22, 30, 0) # Time the backlight should be switched off
 
 # Initialization
 lcd = i2clcd.i2clcd(i2c_bus=1, i2c_addr=0x27, lcd_width=16)
@@ -32,10 +38,18 @@ while True:
         
         datestr = now.strftime("%b %d, %Y")
 
+        if light_on.time() <= now.time() <= light_off.time():
+            lcd.set_backlight(True)
+        else:
+            lcd.set_backlight(False)
+
         lcd.print_line(line0, 0)
         lcd.print_line(datestr, 1)
-    except KeyboardInterrupt:
-        lcd.print_line("                ", 0)
-        lcd.print_line("                ", 1)
-        print ("")
-        sys.exit()
+    except:
+        break
+
+# Reset the display to a safe state before exiting.
+lcd.print_line("                ", 0)  # For some reason the clear() function
+lcd.print_line("                ", 1)  # doesn't work, so I print blank lines
+lcd.set_backlight(False)               # instead.
+print ("")
